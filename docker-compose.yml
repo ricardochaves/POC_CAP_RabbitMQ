@@ -1,0 +1,19 @@
+version: "3.5"
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    volumes:
+      - ./rabbitmq:/etc/rabbitmq/
+    ports:
+      - 61613:61613
+      - 8080:15672
+      - 5672:5672
+  sql-server:
+    image: mcr.microsoft.com/azure-sql-edge
+    environment:
+      - ACCEPT_EULA=1
+      - MSSQL_SA_PASSWORD=MyPass@word
+      - MSSQL_PID=Developer
+      - MSSQL_USER=SA
+    ports:
+      - 1433:1433

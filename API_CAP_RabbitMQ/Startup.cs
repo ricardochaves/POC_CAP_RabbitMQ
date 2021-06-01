@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using API_CAP_RabbitMQ.Consumers;
+using DotNetCore.CAP.Internal;
 using DotNetCore.CAP.Messages;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,12 +12,19 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Models;
 
+
 namespace API_CAP_RabbitMQ
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        public Startup()
         {
+
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile($"appsettings.json")
+                .AddEnvironmentVariables()
+                .Build();
+
             Configuration = configuration;
         }
 
@@ -35,8 +45,13 @@ namespace API_CAP_RabbitMQ
 
             services.AddDbContext<SystemContext>();
 
+            if (Configuration.GetValue<bool>("Is_Consumer"))
+                services.AddTransient<ITestQueueConsumer,TestQueueConsumer>();
+
             services.AddCap(x =>
             {
+
+
                 // If you are using EF, you need to add the configuration：
                 x.UseEntityFramework<SystemContext>(); //Options, Notice: You don't need to config x.UseSqlServer(""") again! CAP can autodiscovery.
 
@@ -45,6 +60,11 @@ namespace API_CAP_RabbitMQ
                 {
                     o.HostName = "localhost";
                     o.Port = 5672;
+                    o.CustomHeaders  = e => new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>(Headers.MessageId, SnowflakeId.Default().NextId().ToString()),
+                        new KeyValuePair<string, string>(Headers.MessageName, e.RoutingKey),
+                    };
                 });
 
                 x.UseDashboard();

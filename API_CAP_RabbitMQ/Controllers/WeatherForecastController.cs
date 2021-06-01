@@ -17,11 +17,6 @@ namespace API_CAP_RabbitMQ.Controllers
         private readonly ICapPublisher _capBus;
         private readonly SystemContext _context;
 
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-        };
-
         private readonly ILogger<WeatherForecastController> _logger;
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger, ICapPublisher capPublisher, SystemContext db)
@@ -42,14 +37,16 @@ namespace API_CAP_RabbitMQ.Controllers
                 Enable = false
             };
 
-            using (_context.Database.BeginTransaction(_capBus, autoCommit: true))
+            await using (_context.Database.BeginTransaction(_capBus, autoCommit: true))
             {
                 _context.Products.Add(p);
-                await _capBus.PublishAsync("product-added", p);
+                // await _capBus.PublishAsync("test.queue", p);
+                await _capBus.PublishAsync("test.queue", "xpto");
                 await _context.SaveChangesAsync();
             }
-
             return Ok();
         }
+
+
     }
 }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using API_CAP_RabbitMQ.Consumers;
+using API_CAP_RabbitMQ.Support;
+using DotNetCore.CAP;
 using DotNetCore.CAP.Internal;
 using DotNetCore.CAP.Messages;
 using Microsoft.AspNetCore.Builder;
@@ -60,13 +62,17 @@ namespace API_CAP_RabbitMQ
                 {
                     o.HostName = "localhost";
                     o.Port = 5672;
+                    o.ExchangeName = "POC";
+
+
                     o.CustomHeaders  = e => new List<KeyValuePair<string, string>>
                     {
-                        new KeyValuePair<string, string>(Headers.MessageId, SnowflakeId.Default().NextId().ToString()),
+                        // new KeyValuePair<string, string>(Headers.MessageId, SnowflakeId.Default().NextId().ToString()),
                         new KeyValuePair<string, string>(Headers.MessageName, e.RoutingKey),
+                        new KeyValuePair<string, string>(Headers.MessageId, MessageIdChecker.CheckMessageIdHeader(e)),
+
                     };
                 });
-
                 x.UseDashboard();
                 x.FailedRetryCount = 2;
                 x.FailedThresholdCallback = failed =>

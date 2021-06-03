@@ -19,3 +19,5 @@ Dash: http://localhost:8080/
 ## CAP
 
 Dash: https://localhost:5001/cap
+
+[Currently, bulk messaging is not supported.](https://cap.dotnetcore.xyz/user-guide/en/cap/messaging/#scheduling)

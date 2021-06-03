@@ -12,10 +12,16 @@ namespace API_CAP_RabbitMQ.Consumers
 
     public class TestQueueConsumer: ITestQueueConsumer, ICapSubscribe
     {
-        [CapSubscribe("test")]
+        [CapSubscribe("product.create", Group = "Product.created")]
         public void CheckReceivedMessage(Product product)
         {
-            Console.WriteLine(product);
+            Console.WriteLine("Product Create" + product);
+        }
+
+        [CapSubscribe("user.command",Group = "User.Command")]
+        public void CheckProduct(Product product)
+        {
+            Console.Write("User Command" + product);
         }
     }
 }

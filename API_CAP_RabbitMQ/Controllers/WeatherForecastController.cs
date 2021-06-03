@@ -40,8 +40,8 @@ namespace API_CAP_RabbitMQ.Controllers
             await using (_context.Database.BeginTransaction(_capBus, autoCommit: true))
             {
                 _context.Products.Add(p);
-                // await _capBus.PublishAsync("test.queue", p);
-                await _capBus.PublishAsync("test.queue", "xpto");
+                await _capBus.PublishAsync("product.create", p);
+
                 await _context.SaveChangesAsync();
             }
             return Ok();

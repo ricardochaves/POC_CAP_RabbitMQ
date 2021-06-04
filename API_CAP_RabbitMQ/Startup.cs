@@ -47,9 +47,6 @@ namespace API_CAP_RabbitMQ
 
             services.AddDbContext<SystemContext>();
 
-            if (Configuration.GetValue<bool>("Is_Consumer"))
-                services.AddTransient<ITestQueueConsumer,TestQueueConsumer>();
-
             services.AddCap(x =>
             {
 

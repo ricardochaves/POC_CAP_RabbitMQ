@@ -27,6 +27,10 @@ namespace API_CAP_RabbitMQ
                 .Build()
                 .RunAsync();
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 
     [Command]
@@ -34,12 +38,8 @@ namespace API_CAP_RabbitMQ
     {
         public async ValueTask ExecuteAsync(IConsole console)
         {
-            await CreateHostBuilder().Build().RunAsync();
+            await Program.CreateHostBuilder(Array.Empty<string>()).Build().RunAsync();
         }
-
-        public static IHostBuilder CreateHostBuilder() =>
-            Host.CreateDefaultBuilder(Array.Empty<string>())
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 
     [Command("consumer")]

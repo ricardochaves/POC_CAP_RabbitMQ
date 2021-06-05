@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using API_CAP_RabbitMQ.Support;
+﻿using DotNetCore.CAP.Internal;
 using DotNetCore.CAP.Messages;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -9,21 +8,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using Models;
+using Sale.Infrastructure;
+using System.Collections.Generic;
 
-
-namespace API_CAP_RabbitMQ
+namespace Sale
 {
     public class Startup
     {
-        public Startup()
+        public Startup(IConfiguration configuration)
         {
-
-            var configuration = new ConfigurationBuilder()
-                .AddJsonFile($"appsettings.json")
-                .AddEnvironmentVariables()
-                .Build();
-
             Configuration = configuration;
         }
 
@@ -33,40 +26,29 @@ namespace API_CAP_RabbitMQ
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<SystemContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddDatabaseDeveloperPageExceptionFilter();
-
-            services.AddControllers();
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo {Title = "API_CAP_RabbitMQ", Version = "v1"});
-            });
-
-            services.AddDbContext<SystemContext>();
+                options.UseSqlServer(Configuration.GetConnectionString("SystemContext")));
 
             services.AddCap(x =>
             {
-
-
                 // If you are using EF, you need to add the configuration：
-                x.UseEntityFramework<SystemContext>(); //Options, Notice: You don't need to config x.UseSqlServer(""") again! CAP can autodiscovery.
+                x.UseEntityFramework<SystemContext>();
+                // Notice: You don't need to config x.UseSqlServer(""") again! CAP can autodiscovery.
 
                 // CAP support RabbitMQ,Kafka,AzureService as the MQ, choose to add configuration you needed：
                 x.UseRabbitMQ(o =>
                 {
-                    o.HostName = "localhost";
-                    o.Port = 5672;
-                    o.ExchangeName = "POC";
+                    o.HostName = Configuration.GetValue<string>("RabbitMQ:HostName");
+                    o.Port = Configuration.GetValue<int>("RabbitMQ:Port");
+                    o.ExchangeName = Configuration.GetValue<string>("RabbitMQ:ExchangeName");
 
-
-                    o.CustomHeaders  = e => new List<KeyValuePair<string, string>>
+                    o.CustomHeaders = e => new List<KeyValuePair<string, string>>
                     {
-                        // new KeyValuePair<string, string>(Headers.MessageId, SnowflakeId.Default().NextId().ToString()),
-                        new KeyValuePair<string, string>(Headers.MessageName, e.RoutingKey),
-                        new KeyValuePair<string, string>(Headers.MessageId, MessageIdChecker.CheckMessageIdHeader(e)),
-
+                        // TODO: use MessageIdChecker
+                        new(Headers.MessageId, SnowflakeId.Default().NextId().ToString()),
+                        new(Headers.MessageName, e.RoutingKey)
                     };
                 });
+
                 x.UseDashboard();
                 x.FailedRetryCount = 2;
                 x.FailedThresholdCallback = failed =>
@@ -76,27 +58,35 @@ namespace API_CAP_RabbitMQ
                         requiring manual troubleshooting. Message name: {failed.Message.GetName()}");
                 };
             });
+
+            services.AddControllers();
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Sale", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SystemContext db)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, SystemContext context)
         {
+            // TODO: use migrations instead!
+            context.Database.EnsureCreated();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API_CAP_RabbitMQ v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sale v1"));
             }
-
-            app.UseHttpsRedirection();
 
             app.UseRouting();
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
-            db.Database.EnsureCreated();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
         }
     }
 }

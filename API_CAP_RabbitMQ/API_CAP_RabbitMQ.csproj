@@ -26,4 +26,8 @@
       <Folder Include="Migrations" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\CAP_Consumer\CAP_Consumer.csproj" />
+    </ItemGroup>
+
 </Project>

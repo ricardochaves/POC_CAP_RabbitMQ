@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using DotNetCore.CAP;
 using Microsoft.AspNetCore.Http;
@@ -40,7 +41,7 @@ namespace API_CAP_RabbitMQ.Controllers
             await using (_context.Database.BeginTransaction(_capBus, autoCommit: true))
             {
                 _context.Products.Add(p);
-                await _capBus.PublishAsync("product.create", p);
+                await _capBus.PublishAsync("sale-created", p);
 
                 await _context.SaveChangesAsync();
             }

@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using CAP_Consumer;
 using DotNetCore.CAP;
 using Models;
 
@@ -15,13 +17,21 @@ namespace API_CAP_RabbitMQ.Consumers
         [CapSubscribe("product.create", Group = "Product.created")]
         public void CheckReceivedMessage(Product product)
         {
-            Console.WriteLine("Product Create" + product);
+
+            Consumer.ExecuteMessage(product, Execute);
         }
 
-        [CapSubscribe("user.command",Group = "User.Command")]
-        public void CheckProduct(Product product)
+        // [CapSubscribe("user.command",Group = "User.Command")]
+        // public void CheckProduct(Product product)
+        // {
+        //     Console.Write("User Command" + product);
+        // }
+
+        public static async void Execute(PKGMessage<Product> message)
         {
-            Console.Write("User Command" + product);
+            var p = message.Data;
+            // ...
+            message.Commit();
         }
     }
 }

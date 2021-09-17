@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "API_CAP_RabbitMQ", "API_CAP_RabbitMQ\API_CAP_RabbitMQ.csproj", "{447D7C42-301A-4F6C-A5A3-07A6564253F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CAP_Consumer", "CAP_Consumer\CAP_Consumer.csproj", "{36AFF338-8CEB-4596-8DF0-8026DCA01DB1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{447D7C42-301A-4F6C-A5A3-07A6564253F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{447D7C42-301A-4F6C-A5A3-07A6564253F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{447D7C42-301A-4F6C-A5A3-07A6564253F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36AFF338-8CEB-4596-8DF0-8026DCA01DB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36AFF338-8CEB-4596-8DF0-8026DCA01DB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36AFF338-8CEB-4596-8DF0-8026DCA01DB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36AFF338-8CEB-4596-8DF0-8026DCA01DB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
